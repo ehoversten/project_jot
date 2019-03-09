@@ -18,6 +18,10 @@ mongoose.connect('mongodb://localhost/project_idea_dev', {
     .then(() => console.log("MongoDB Connected ..."))
     .catch((err) => console.log(err));
 
+// LOAD DATABASE DATA
+require('./models/Idea');
+const Idea = mongoose.model('ideas');
+
 
 // --- MIDDLEWEAR --- //
 
