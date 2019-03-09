@@ -81,7 +81,20 @@ app.post('/ideas', (req, res) => {
       details: req.body.details
     });
   } else {
-      res.send("PASSED");
+    //   res.send("PASSED");
+    // Save new OBJECT to Database
+    const newUser = {
+        title: req.body.title,
+        details: req.body.details,
+        // user: req.user.id
+    }
+    new Idea(newUser)
+        .save()
+        // Promise
+        .then(idea => {
+            // redirect to Ideas List page
+            res.redirect('/ideas');
+        })
   }
 });
 
