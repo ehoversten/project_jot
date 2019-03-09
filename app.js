@@ -54,16 +54,41 @@ app.get('/about', (req, res) => {
   res.render('about')
 });
 
-app.get('/ideas/add', (req, res) => {
-  res.render('ideas/add')
+// IDEA LIST (INDEX) PAGE
+app.get('/ideas', (req, res) => {
+    Idea.find({})
+        .sort({date:'desc'})
+        .then(ideas => {
+            res.render('ideas/index', {
+                ideas: ideas
+            });
+        });
 });
 
-// PROCESS FORM
+// ADD IDEA FORM PAGE
+app.get('/ideas/add', (req, res) => {
+  res.render('ideas/add');
+});
+
+// EDIT IDEA FORM
+app.get('/ideas/edit/:id', (req, res) => {
+    Idea.findOne({
+        _id: req.params.id
+    })
+    .then(idea => {
+        res.render('ideas/edit', {
+            idea: idea
+        });
+    });
+});
+
+// PROCESS ADD FORM
 app.post('/ideas', (req, res) => {
   /* A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body). */
   // console.log(req.body);
   // res.send('OK');
 
+  // Create ERRORS array
   let errors = []
   // Server-side form validation
   if (!req.body.title) {
