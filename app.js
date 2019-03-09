@@ -19,7 +19,7 @@ app.set('view engine', 'handlebars');
 
 // INDEX ROUTE
 app.get('/', (req, res) => {
-    const title = 'INDEX'
+    const title = 'Welcome'
     res.render('index', {
         title: title
     });
