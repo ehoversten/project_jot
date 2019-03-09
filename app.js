@@ -4,9 +4,20 @@
 const express = require('express');
 // Load Express Handlebars Module
 const exphbs = require('express-handlebars');
+// Load Mongoose Database
+const mongoose = require('mongoose');
+
 
 // Invoke Express
 const app = express();
+
+// --- CONNECT TO DATABASE --- //
+mongoose.connect('mongodb://localhost/project_idea_dev', {
+    useNewUrlParser: true
+})
+    .then(() => console.log("MongoDB Connected ..."))
+    .catch((err) => console.log(err));
+
 
 // --- MIDDLEWEAR --- //
 
