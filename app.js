@@ -15,8 +15,9 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 // Connect Flash Module (Flash Messages)
 const flash = require('connect-flash');
-// Load Mongoose Database
+// Load Mongoose Database Module
 const mongoose = require('mongoose');
+
 
 // Invoke Express
 const app = express();
