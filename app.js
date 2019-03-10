@@ -19,6 +19,11 @@ const mongoose = require('mongoose');
 // Invoke Express
 const app = express();
 
+// Connect/Load external Routes
+const ideas = require('./routes/ideas');
+const users = require('./routes/users');
+
+
 // --- CONNECT TO DATABASE --- //
 mongoose
   .connect(
@@ -30,9 +35,9 @@ mongoose
   .then(() => console.log('MongoDB Connected ...'))
   .catch(err => console.log(err));
 
-// LOAD DATABASE DATA
-require('./models/Idea');
-const Idea = mongoose.model('ideas');
+// LOAD DATABASE DATA -> ** moved into ideas.js Router file
+// require('./models/Idea');
+// const Idea = mongoose.model('ideas');
 
 // --- MIDDLEWEAR --- //
 
@@ -85,107 +90,10 @@ app.get('/about', (req, res) => {
   res.render('about')
 });
 
-// IDEA LIST (INDEX) PAGE
-app.get('/ideas', (req, res) => {
-    Idea.find({})
-        .sort({date:'desc'})
-        .then(ideas => {
-            res.render('ideas/index', {
-                ideas: ideas
-            });
-        });
-});
 
-// ADD IDEA FORM PAGE
-app.get('/ideas/add', (req, res) => {
-  res.render('ideas/add');
-});
-
-// EDIT IDEA FORM
-app.get('/ideas/edit/:id', (req, res) => {
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .then(idea => {
-        res.render('ideas/edit', {
-            idea: idea
-        });
-    });
-});
-
-// PROCESS ADD FORM
-app.post('/ideas', (req, res) => {
-  /* A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body). */
-  // console.log(req.body);
-  // res.send('OK');
-
-  // Create ERRORS array
-  let errors = []
-  // Server-side form validation
-  if (!req.body.title) {
-    errors.push({ text: 'Please enter a title' });
-  }
-  if (!req.body.details) {
-    errors.push({ text: 'Please enter a description' });
-  }
-  // IF ERRORS EXIST
-  if (errors.length > 0) {
-    // re-render the form
-    res.render('ideas/add', {
-      errors: errors,
-      title: req.body.title,
-      details: req.body.details
-    });
-  } else {
-    //   res.send("PASSED");
-    // Save new OBJECT to Database
-    const newUser = {
-        title: req.body.title,
-        details: req.body.details,
-        // user: req.user.id
-    }
-    new Idea(newUser)
-        .save()
-        // Create Promise
-        .then(idea => {
-            // show flash message
-            req.flash('success_msg', 'Project Idea Added');
-
-            // redirect to Ideas List page
-            res.redirect('/ideas');
-        })
-  }
-});
-
-// PROCESS EDIT FORM
-app.put('/ideas/:id', (req, res) => {
-
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .then(idea => {
-        // input new values
-        idea.title = req.body.title;
-        idea.details = req.body.details;
-
-        idea.save()
-            .then(idea => {
-                // show flash message
-                req.flash('success_msg', 'Project Idea Updated');
-                res.redirect('/ideas');
-            });
-    });
-});
-
-// DELETE IDEA
-app.delete('/ideas/:id', (req, res) => {
-    Idea.remove({_id: req.params.id})
-        .then(() => {
-            // show flash message
-            req.flash('success_msg', 'Project Idea Removed');
-            res.redirect('/ideas');
-        });
-});
+// Use External Routes
+app.use('/ideas', ideas);
+app.use('/users', users);
 
 // --- SERVER --- //
 
