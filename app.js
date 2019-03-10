@@ -148,6 +148,14 @@ app.put('/ideas/:id', (req, res) => {
     });
 });
 
+// DELETE IDEA
+app.delete('/ideas/:id', (req, res) => {
+    Idea.remove({_id: req.params.id})
+        .then(() => {
+            res.redirect('/ideas')
+        });
+});
+
 // --- SERVER --- //
 
 // Declare a port
