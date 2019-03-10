@@ -7,6 +7,8 @@ const exphbs = require('express-handlebars');
 // Load Body Parser Module
 /* (Parse incoming request bodies in a middleware before your handlers, available under the req.body property) */
 const bodyParser = require('body-parser');
+// Load Method Override Module
+const methodOverride = require('method-override');
 // Load Mongoose Database
 const mongoose = require('mongoose');
 
@@ -38,6 +40,11 @@ app.use(bodyParser.json());
 // Express-Handlebars
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
+
+// Method Override
+// override with POST having ?_method=DELETE
+app.use(methodOverride('_method'));
+
 
 // --- ROUTING --- //
 
@@ -121,6 +128,24 @@ app.post('/ideas', (req, res) => {
             res.redirect('/ideas');
         })
   }
+});
+
+// PROCESS EDIT FORM
+app.put('/ideas/:id', (req, res) => {
+
+    Idea.findOne({
+        _id: req.params.id
+    })
+    .then(idea => {
+        // input new values
+        idea.title = req.body.title;
+        idea.details = req.body.details;
+
+        idea.save()
+            .then(idea => {
+                res.redirect('/ideas');
+            })
+    });
 });
 
 // --- SERVER --- //
