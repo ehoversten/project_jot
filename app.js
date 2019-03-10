@@ -1,7 +1,9 @@
 // --- LOAD MODULES --- //
 
-// Load the express module
+// Load Express Module
 const express = require('express');
+// Load Path Module
+const path = require('path');
 // Load Express Handlebars Module
 const exphbs = require('express-handlebars');
 // Load Body Parser Module
@@ -45,6 +47,9 @@ mongoose
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
+
+// Static Folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Express-Handlebars
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
