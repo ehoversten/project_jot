@@ -9,6 +9,10 @@ const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 // Load Method Override Module
 const methodOverride = require('method-override');
+// Express Session Module
+const session = require('express-session');
+// Connect Flash Module (Flash Messages)
+const flash = require('connect-flash');
 // Load Mongoose Database
 const mongoose = require('mongoose');
 
@@ -44,6 +48,26 @@ app.set('view engine', 'handlebars');
 // Method Override
 // override with POST having ?_method=DELETE
 app.use(methodOverride('_method'));
+
+// Express Session
+app.use(session({
+    secret: 'pass1234',
+    resave: true,
+    saveUninitialized: true,
+    // cookie: { secure: true }
+}));
+
+// Connect Flash Messages
+app.use(flash());
+
+// Global Variables 
+app.use(function(req, res, next) {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    // calls next piece of middlewear
+    next();
+});
 
 
 // --- ROUTING --- //
@@ -122,8 +146,11 @@ app.post('/ideas', (req, res) => {
     }
     new Idea(newUser)
         .save()
-        // Promise
+        // Create Promise
         .then(idea => {
+            // show flash message
+            req.flash('success_msg', 'Project Idea Added');
+
             // redirect to Ideas List page
             res.redirect('/ideas');
         })
@@ -143,8 +170,10 @@ app.put('/ideas/:id', (req, res) => {
 
         idea.save()
             .then(idea => {
+                // show flash message
+                req.flash('success_msg', 'Project Idea Updated');
                 res.redirect('/ideas');
-            })
+            });
     });
 });
 
@@ -152,7 +181,9 @@ app.put('/ideas/:id', (req, res) => {
 app.delete('/ideas/:id', (req, res) => {
     Idea.remove({_id: req.params.id})
         .then(() => {
-            res.redirect('/ideas')
+            // show flash message
+            req.flash('success_msg', 'Project Idea Removed');
+            res.redirect('/ideas');
         });
 });
 
