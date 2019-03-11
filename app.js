@@ -9,6 +9,8 @@ const exphbs = require('express-handlebars');
 // Load Body Parser Module
 /* (Parse incoming request bodies in a middleware before your handlers, available under the req.body property) */
 const bodyParser = require('body-parser');
+// Load Passport Module
+const passport = require('passport');
 // Load Method Override Module
 const methodOverride = require('method-override');
 // Express Session Module
@@ -26,6 +28,10 @@ const app = express();
 const ideas = require('./routes/ideas');
 const users = require('./routes/users');
 
+// Passport Configuration
+require('./config/passport')(passport);
+
+
 
 // --- CONNECT TO DATABASE --- //
 mongoose
@@ -42,7 +48,7 @@ mongoose
 // require('./models/Idea');
 // const Idea = mongoose.model('ideas');
 
-// --- MIDDLEWEAR --- //
+// --- MIDDLEWARE --- //
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -68,6 +74,11 @@ app.use(session({
     // cookie: { secure: true }
 }));
 
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 // Connect Flash Messages
 app.use(flash());
 
@@ -76,6 +87,8 @@ app.use(function(req, res, next) {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
+    // User logged in?
+    res.locals.user = req.user || null;
     // calls next piece of middlewear
     next();
 });
@@ -97,9 +110,10 @@ app.get('/about', (req, res) => {
 });
 
 
-// Use External Routes
+// Load External Routes
 app.use('/ideas', ideas);
 app.use('/users', users);
+
 
 // --- SERVER --- //
 
