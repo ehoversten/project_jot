@@ -6,6 +6,8 @@ const express = require('express');
 const router = express.Router();
 // Load Mongoose Database
 const mongoose = require('mongoose');
+// Load Helper Authentication Module
+const { ensureAuthenticated } = require('../helpers/auth');
 
 
 // LOAD DATABASE DATA
@@ -17,7 +19,7 @@ const Idea = mongoose.model('ideas');
 
 
 // IDEA LIST (INDEX) PAGE
-router.get('/', (req, res) => {
+router.get('/', ensureAuthenticated, (req, res) => {
     Idea.find({})
         .sort({ date: 'desc' })
         .then(ideas => {
@@ -28,12 +30,13 @@ router.get('/', (req, res) => {
 });
 
 // ADD IDEA FORM PAGE
-router.get('/add', (req, res) => {
+router.get('/add', ensureAuthenticated,(req, res) => {
     res.render('ideas/add');
 });
 
 // EDIT IDEA FORM
-router.get('/edit/:id', (req, res) => {
+router.get('/edit/:id', ensureAuthenticated
+, (req, res) => {
     Idea.findOne({
         _id: req.params.id
     })
@@ -45,7 +48,7 @@ router.get('/edit/:id', (req, res) => {
 });
 
 // PROCESS ADD FORM
-router.post('/', (req, res) => {
+router.post('/', ensureAuthenticated, (req, res) => {
     /* A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body). */
     // console.log(req.body);
     // res.send('OK');
@@ -89,7 +92,7 @@ router.post('/', (req, res) => {
 });
 
 // PROCESS EDIT FORM
-router.put('/:id', (req, res) => {
+router.put('/:id', ensureAuthenticated, (req, res) => {
 
     Idea.findOne({
         _id: req.params.id
@@ -109,7 +112,7 @@ router.put('/:id', (req, res) => {
 });
 
 // DELETE IDEA
-router.delete('/:id', (req, res) => {
+router.delete('/:id', ensureAuthenticated, (req, res) => {
     Idea.remove({ _id: req.params.id })
         .then(() => {
             // show flash message
