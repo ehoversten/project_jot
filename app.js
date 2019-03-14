@@ -32,16 +32,13 @@ const users = require('./routes/users');
 // Passport Configuration
 require('./config/passport')(passport);
 
-
+// DB Config
+const db = require('./config/database');
 
 // --- CONNECT TO DATABASE --- //
-mongoose
-  .connect(
-    'mongodb://localhost/project_idea_dev',
-    {
-      useNewUrlParser: true
-    }
-  )
+mongoose.connect(db.mongoURI, {
+    useNewUrlParser: true
+  })
   .then(() => console.log('MongoDB Connected ...'))
   .catch(err => console.log(err));
 
@@ -119,7 +116,7 @@ app.use('/users', users);
 // --- SERVER --- //
 
 // Declare a port
-const PORT = 5000
+const PORT = process.env.PORT || 5000
 
 // Tell the express app to listen on port XXXX
 app.listen(PORT, function () {
